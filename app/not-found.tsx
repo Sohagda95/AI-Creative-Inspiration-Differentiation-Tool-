@@ -1,0 +1,1 @@
+export default function NotFound(){return <main className="grid min-h-screen place-items-center p-6"><div className="text-center"><div className="text-6xl font-bold">404</div><p className="mt-3 text-white/45">This page does not exist.</p><a href="/" className="mt-6 inline-block rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black">Back home</a></div></main>}

@@ -1,0 +1,13 @@
+import {decryptSecret} from '@/lib/secret-box';
+import {createSupabaseAdmin} from '@/lib/supabase/admin';
+let cursor=0;
+function envKeys(){const keys:string[]=[];if(process.env.OPENAI_API_KEY?.trim())keys.push(process.env.OPENAI_API_KEY.trim());for(let i=1;i<=100;i++){const v=process.env[`OPENAI_API_KEY_${i}`]?.trim();if(v)keys.push(v)}return [...new Set(keys)];}
+async function dbKeys(){try{const admin=createSupabaseAdmin();const {data}=await admin.from('api_keys').select('id,encrypted_secret,enabled,cooldown_until').eq('enabled',true);const now=Date.now();return (data??[]).filter(k=>!k.cooldown_until||new Date(k.cooldown_until).getTime()<=now).map(k=>({id:k.id,key:decryptSecret(k.encrypted_secret)}));}catch{return [];}}
+export async function getApiKeyPoolStatus(){const env=envKeys();const db=await dbKeys();return {total:env.length+db.length,environmentKeys:env.length,databaseKeys:db.length,activeIndex:(env.length+db.length)?cursor%(env.length+db.length):-1};}
+export function resetApiKeyCursor(){cursor=0;}
+async function recordDb(id:string,ok:boolean,error?:unknown){try{const admin=createSupabaseAdmin();const e=error as any;const rotate=Number(e?.status)===401||Number(e?.status)===429||String(e?.code||'').toLowerCase().includes('quota');const cooldown=rotate?new Date(Date.now()+300000).toISOString():null;const {data}=await admin.from('api_keys').select('failure_count').eq('id',id).single();await admin.from('api_keys').update({status:ok?'healthy':'error',last_used_at:new Date().toISOString(),last_error_at:ok?null:new Date().toISOString(),failure_count:ok?0:(data?.failure_count??0)+1,cooldown_until:cooldown}).eq('id',id);}catch{}}
+export async function withApiKeyRotation<T>(fn:(apiKey:string)=>Promise<T>,shouldRotate:(error:unknown)=>boolean=isQuotaOrRateLimitError):Promise<T>{
+ const env=envKeys().map(key=>({key,id:null as string|null}));const db=await dbKeys();const all=[...env,...db];if(!all.length)throw new Error('No OpenAI API keys configured.');let last:any;const start=cursor%all.length;
+ for(let offset=0;offset<all.length;offset++){const idx=(start+offset)%all.length;cursor=idx;const item=all[idx];try{const out=await fn(item.key);if(item.id)await recordDb(item.id,true);cursor=(idx+1)%all.length;return out;}catch(e){last=e;if(item.id)await recordDb(item.id,false,e);if(!shouldRotate(e))throw e;}}
+ throw last??new Error('All configured API keys failed.');}
+export function isQuotaOrRateLimitError(error:unknown){const e=error as any;const status=e?.status;const code=String(e?.code??'').toLowerCase();const msg=String(e?.message??'').toLowerCase();return status===401||status===429||code.includes('rate')||code.includes('quota')||msg.includes('rate limit')||msg.includes('quota')||msg.includes('insufficient_quota');}

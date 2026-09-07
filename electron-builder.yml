@@ -1,0 +1,32 @@
+appId: com.sudebmondal.aicreativeinspiration
+productName: AI Creative Inspiration & Differentiation Tool
+artifactName: AI-Creative-Inspiration-Differentiation-Tool-Setup-${version}.${ext}
+
+directories:
+  output: release
+
+files:
+  - electron/**/*
+  - package.json
+
+extraResources:
+  - from: .next/standalone
+    to: app
+  - from: .next/static
+    to: app/.next/static
+  - from: public
+    to: app/public
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: AI Creative Inspiration & Differentiation Tool
+  deleteAppDataOnUninstall: false

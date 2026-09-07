@@ -1,0 +1,2 @@
+'use client';
+export default function Error({reset}:{error:Error & {digest?:string};reset:()=>void}){return <main className="grid min-h-screen place-items-center p-6"><div className="max-w-md rounded-3xl border border-white/10 bg-white/[.04] p-8 text-center"><h1 className="text-2xl font-semibold">Something went wrong</h1><p className="mt-3 text-sm text-white/45">The page hit an unexpected error. Try again.</p><button onClick={()=>reset()} className="mt-6 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black">Try again</button></div></main>}

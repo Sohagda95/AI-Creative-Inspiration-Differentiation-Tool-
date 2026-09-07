@@ -1,0 +1,25 @@
+# Release Checklist
+
+- [ ] Database schema/migrations applied in order
+- [ ] RLS enabled on user-owned tables
+- [ ] Browser cannot insert/update/delete queue jobs directly
+- [ ] Privileged RPCs callable only by server role
+- [ ] OpenAI keys configured and at least one healthy
+- [ ] Supabase server secret configured
+- [ ] APP_ENCRYPTION_KEY configured and backed up securely
+- [ ] CRON_SECRET configured
+- [ ] Production app URL uses HTTPS
+- [ ] Stripe production/test mode intentionally selected
+- [ ] Stripe webhook signing secret configured
+- [ ] Stripe price IDs match Creator / Pro / Studio
+- [ ] Direct analysis credit charge/refund tested
+- [ ] Queue charge/retry/refund tested
+- [ ] Project save/reopen/delete tested
+- [ ] Admin authorization tested
+- [ ] Subscription create/update/cancel tested
+- [ ] `npm run release:smoke` passes
+- [ ] `npm run check:env` passes in deployment environment
+- [ ] `npm run typecheck` passes
+- [ ] `npm run build` passes
+- [ ] Health endpoint reports `ok`
+- [ ] Backup/rollback point created before production migration

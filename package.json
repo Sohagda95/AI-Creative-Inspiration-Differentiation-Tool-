@@ -1,0 +1,37 @@
+{
+  "name": "ai-creative-inspiration-tool",
+  "version": "0.18.3",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "release:smoke": "node scripts/release-smoke.mjs",
+    "check:env": "node scripts/check-env.mjs",
+    "release:verify": "npm run release:smoke && npm run typecheck",
+    "release:verify-static": "node scripts/verify-release.mjs",
+    "desktop:build": "next build",
+    "desktop:dist": "npm run desktop:build && electron-builder --win nsis --publish never"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.57.0",
+    "lucide-react": "^0.468.0",
+    "next": "15.5.24",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^20.17.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.6.3",
+    "electron": "^38.8.6",
+    "electron-builder": "^26.1.0"
+  },
+  "main": "electron/main.cjs"
+}

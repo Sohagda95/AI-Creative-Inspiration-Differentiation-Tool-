@@ -1,0 +1,2 @@
+import {NextResponse} from 'next/server'; import {requireAdmin} from '@/lib/admin';
+export async function GET(){try{const {admin}=await requireAdmin(); const {data,error}=await admin.from('profiles').select('id,display_name,role,plan,credits,credits_used,credits_reset_at,created_at').order('created_at',{ascending:false}).limit(200); if(error)throw error; return NextResponse.json({users:data??[]});}catch(e:any){return NextResponse.json({error:e.message},{status:e.status||500});}}
